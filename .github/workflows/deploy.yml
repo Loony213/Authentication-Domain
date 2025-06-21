@@ -1,0 +1,22 @@
+name: Deploy Auth Service to EC2
+
+on:
+  push:
+    branches:
+      - test
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Conectar a EC2 y desplegar
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: 54.90.135.231
+        username: ec2-user
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          docker stop auth-service || true
+          docker rm auth-service || true
+          docker pull kamartinez/auth-service
+          docker run -d --name auth-service -p 5000:5000 kamartinez/auth-service
