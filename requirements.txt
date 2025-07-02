@@ -1,5 +1,0 @@
-Flask
-pyodbc
-flask-cors
-python-dotenv
-PyJWT

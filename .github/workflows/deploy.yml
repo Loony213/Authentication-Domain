@@ -1,22 +1,53 @@
-name: Deploy Auth Service to EC2
+name: Deploy Authentication Services to EC2
 
 on:
   push:
     branches:
-      - test
+      - main  
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Conectar a EC2 y desplegar
+    
+    - name: Set up SSH key for EC2
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+    
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Build Docker images for login and register services
+      run: |
+        docker build -t kamartinez/login-service ./Login
+        docker build -t kamartinez/register-service ./Register
+
+    - name: Push images to Docker Hub
+      run: |
+        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        docker push kamartinez/login-service
+        docker push kamartinez/register-service
+
+   
+   
+    - name: Deploy services to EC2
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: 52.1.37.215
+        host: 52.1.37.215  
         username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
+          # Detener contenedores existentes si hay
           docker stop auth-service || true
           docker rm auth-service || true
-          docker pull kamartinez/auth-service
-          docker run -d --name auth-service -p 5000:5000 kamartinez/auth-service
+
+          # Descargar las últimas imágenes de Docker Hub
+          docker pull kamartinez/login-service
+          docker pull kamartinez/register-service
+
+          # Ejecutar los contenedores de Login y Register
+          docker run -d --name login-service -p 8001:8001 kamartinez/login-service
+          docker run -d --name register-service -p 8002:8002 kamartinez/register-service
