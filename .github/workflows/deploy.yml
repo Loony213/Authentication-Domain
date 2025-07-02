@@ -16,7 +16,6 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-    
     - name: Checkout repository
       uses: actions/checkout@v2
 
@@ -31,23 +30,23 @@ jobs:
         docker push kamartinez/login-service
         docker push kamartinez/register-service
 
-   
-   
     - name: Deploy services to EC2
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: 52.1.37.215  
+        host: 52.1.37.215  # IP de tu EC2
         username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-        
-          docker stop auth-service || true
-          docker rm auth-service || true
+          # Detener y eliminar contenedores anteriores si existen
+          docker stop login-service || true
+          docker rm login-service || true
+          docker stop register-service || true
+          docker rm register-service || true
 
-          
+          # Descargar las últimas imágenes de Docker
           docker pull kamartinez/login-service
           docker pull kamartinez/register-service
 
-          
+          # Ejecutar los nuevos contenedores con las imágenes más recientes
           docker run -d --name login-service -p 8001:8001 kamartinez/login-service
           docker run -d --name register-service -p 8002:8002 kamartinez/register-service
