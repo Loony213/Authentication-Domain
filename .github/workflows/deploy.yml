@@ -3,7 +3,7 @@ name: Deploy Authentication Services to EC2
 on:
   push:
     branches:
-      - main  
+      - test  
 
 jobs:
   deploy:
@@ -40,14 +40,14 @@ jobs:
         username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          # Detener contenedores existentes si hay
+        
           docker stop auth-service || true
           docker rm auth-service || true
 
-          # Descargar las últimas imágenes de Docker Hub
+          
           docker pull kamartinez/login-service
           docker pull kamartinez/register-service
 
-          # Ejecutar los contenedores de Login y Register
+          
           docker run -d --name login-service -p 8001:8001 kamartinez/login-service
           docker run -d --name register-service -p 8002:8002 kamartinez/register-service
