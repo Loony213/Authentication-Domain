@@ -23,17 +23,19 @@ jobs:
       run: |
         docker build -t kamartinez/login-service ./Login
         docker build -t kamartinez/register-service ./Register
+        docker build -t kamartinez/login-root ./Login-Root
 
     - name: Push images to Docker Hub
       run: |
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
         docker push kamartinez/login-service
         docker push kamartinez/register-service
+        docker push kamartinez/login-root
 
     - name: Deploy services to EC2
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: 52.1.37.215  # IP de tu EC2
+        host: 52.1.37.215 
         username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
@@ -42,11 +44,15 @@ jobs:
           docker rm login-service || true
           docker stop register-service || true
           docker rm register-service || true
+          docker stop login-root || true
+          docker rm login-root || true
 
           # Descargar las últimas imágenes de Docker
           docker pull kamartinez/login-service
           docker pull kamartinez/register-service
+          docker pull kamartinez/login-root
 
           # Ejecutar los nuevos contenedores con las imágenes más recientes
           docker run -d --name login-service -p 8001:8001 kamartinez/login-service
           docker run -d --name register-service -p 8002:8002 kamartinez/register-service
+          docker run -d --name login-root -p 8003:8003 kamartinez/login-root
