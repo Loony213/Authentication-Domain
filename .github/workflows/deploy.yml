@@ -39,7 +39,7 @@ jobs:
         username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          # Detener y eliminar contenedores anteriores si existen
+          # De
           docker stop login-service || true
           docker rm login-service || true
           docker stop register-service || true
@@ -47,12 +47,12 @@ jobs:
           docker stop login-root || true
           docker rm login-root || true
 
-          # Descargar las últimas imágenes de Docker
+          # D
           docker pull kamartinez/login-service
           docker pull kamartinez/register-service
           docker pull kamartinez/login-root
 
-          # Ejecutar los nuevos contenedores con las imágenes más recientes
-          docker run -d --name login-service -p 8001:8001 kamartinez/login-service
-          docker run -d --name register-service -p 8002:8002 kamartinez/register-service
-          docker run -d --name login-root -p 8003:8003 kamartinez/login-root
+          # Eje
+          docker run -d --name login-service -p 8001:8001 --restart unless-stopped kamartinez/login-service
+          docker run -d --name register-service -p 8002:8002 --restart unless-stopped kamartinez/register-service
+          docker run -d --name login-root -p 8003:8003 --restart unless-stopped kamartinez/login-root
