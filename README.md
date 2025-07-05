@@ -1,95 +1,87 @@
 
-# 🔐 Authentication-Domain
+# Authentication Domain 🔐
 
-This microservice is part of the real-time chat distributed system. It handles **user authentication**, including **login** and **registration** functionalities.
+## Overview 🌟
 
----
+The **Authentication Domain** is a collection of microservices designed to manage user authentication and registration. This domain includes three main microservices:
+- **LoginRoot**: A service that allows root users to log in.
+- **Login**: A service that facilitates logging in for normal users.
+- **Register**: A service that enables users to register their accounts.
 
-## 📌 What does it do?
+All services are connected to a **SQL Server** database, which is used to store user data and credentials securely.
 
-- ✅ Registers new users
-- 🔑 Authenticates users via credentials
-- 🔒 Validates users in the system
-- 📤 Exposes RESTful API endpoints to be consumed by the React frontend or other services
+### Purpose 💡
 
----
+The **Authentication Domain** provides a modular and scalable solution for managing user authentication. The domain's services are designed to work together while maintaining separation of concerns, allowing for easier maintenance and expansion. The system ensures that both root and normal users can log in securely, and it also provides a registration service to handle new user accounts.
 
-## 🧩 Architecture
+## Key Features 🔑
 
-- 🧱 **Style**: Independent microservice
-- 🌐 **API**: REST (FastAPI)
-- 🐍 **Language**: Python 3.11+
-- 🐳 **Container**: Dockerized for easy deployment
+- **LoginRoot Service**: Designed for root users, allowing them to log into the system with their credentials. This service manages authentication for administrative users.
+- **Login Service**: Manages authentication for normal users, validating their credentials before granting access to the system.
+- **Register Service**: Provides a registration endpoint that allows new users to create an account in the system.
+- **SQL Server Integration**: All services are connected to a SQL Server database where user data, credentials, and session information are securely stored.
+- **Secure Authentication**: Passwords are stored securely using encryption methods to protect user data from unauthorized access.
 
----
+## Technology Stack ⚙️
 
-## 📁 Project Structure
+- **Programming Languages**: The services are built using **Node.js** and **Express** for handling HTTP requests and responses.
+- **Database**: The system uses **SQL Server** to store user data and credentials.
+- **Docker**: Each service is containerized using Docker for consistent and scalable deployment.
+- **Docker Compose**: The system can be deployed using **Docker Compose**, which simplifies running multiple services together.
 
-```
-.
-├── .github/workflows       # CI/CD workflows
-├── Login/                  # Login logic
-├── Register/               # User registration logic
-├── app.py                  # Main entry point with FastAPI routes
-├── Dockerfile              # Docker image of the microservice
-├── requirements.txt        # Python dependencies
-└── README.md               # This file
-```
+## Folder Structure 📁
 
----
+### Main Folders:
+- **LoginRoot**: Contains the service responsible for logging in root users. It manages the authentication process for admin users.
+- **Login**: Contains the service for logging in normal users, ensuring secure access to the system for regular users.
+- **Register**: Contains the service that handles the user registration process, enabling new users to create accounts.
+- **config**: Holds configuration files for environment variables and settings for each service.
+- **controllers**: Contains the logic for handling HTTP requests related to user authentication and registration.
+- **services**: Contains the core business logic for user login and registration.
+- **utils**: Contains utility files, such as helper functions for password hashing or other security measures.
+- **docker-compose.yml**: A Docker Compose configuration file that defines how all services are connected and run in containers.
+- **README.md**: This file, providing an overview of the **Authentication Domain** and how it works.
 
-## 🚀 How to Deploy
+## How to Deploy 🛠️
 
-### 🐳 Using Docker
+### Steps to Deploy:
 
-1. **Clone the repository**:
+1. **Clone the Repository**:
+    ```bash
+    git clone https://github.com/Loony213/Authentication-Domain.git
+    cd Authentication-Domain
+    ```
 
-```bash
-git clone https://github.com/your_user/Authentication-Domain.git
-cd Authentication-Domain
-```
+2. **Build and Run with Docker Compose**:
+    ```bash
+    docker-compose up --build
+    ```
 
-2. **Build the Docker image**:
+    This command will start all the services defined in the **docker-compose.yml** file, ensuring they are correctly linked together and ready to handle requests.
 
-```bash
-docker build -t kamartinez/authentication-domain .
-```
-
-3. **Run the container**:
-
-```bash
-docker run -d -p 8000:8000 kamartinez/authentication-domain
-```
-
-The API will be available at:  
-📍 `http://localhost:8000`
-
----
-
-## 🧪 Main Endpoints
-
-- `POST /register` → Registers a new user
-- `POST /login` → Logs in and validates credentials
+3. **Access the Services**:
+    After deploying, the services will be available at:
+    - **LoginRoot**: Accessible at **http://localhost:8001** (or the respective service port).
+    - **Login**: Accessible at **http://localhost:8002**.
+    - **Register**: Accessible at **http://localhost:8003**.
 
 ---
 
-## 🔗 Integrations
+## Technologies Used ⚙️
 
-- 🔐 Connects to SQL Server on RDS (AWS)
-- 🧩 Communicates with the React frontend and other microservices
-
----
-
-## 🛠️ Requirements
-
-- Python 3.11+
-- Docker
-- Database access with environment variables configured
+- **Node.js**: A JavaScript runtime used to build fast, scalable network applications.
+- **Express.js**: A minimal and flexible Node.js web application framework used to handle HTTP requests.
+- **SQL Server**: A relational database management system used to store user credentials and data securely.
+- **Docker**: A platform for developing, shipping, and running applications in containers.
+- **Docker Compose**: A tool for defining and running multi-container Docker applications.
 
 ---
 
-## 👤 Author
+### In Summary 📝
 
-Developed by **Loony213**  
-Domain: `Authentication-Domain`  
-Part of the **Distribuida** distributed system
+The **Authentication Domain** provides three essential microservices: **LoginRoot**, **Login**, and **Register**, which are designed to manage authentication and registration for users and admins. By utilizing **SQL Server** for storing user credentials and Docker for deployment, this domain ensures a scalable, secure, and easy-to-maintain authentication system.
+
+---
+
+### Start Securing Your Application Today! 🔐
+Get your users registered and authenticated with ease using this simple yet powerful domain! 💪
