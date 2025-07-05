@@ -24,6 +24,7 @@ jobs:
         docker build -t kamartinez/login-service ./Login
         docker build -t kamartinez/register-service ./Register
         docker build -t kamartinez/login-root ./Login-Root
+        docker build -t kamartinez/password ./password-microservice
 
     - name: Push images to Docker Hub
       run: |
@@ -31,6 +32,7 @@ jobs:
         docker push kamartinez/login-service
         docker push kamartinez/register-service
         docker push kamartinez/login-root
+        docker push kamartinez/password
 
     - name: Deploy services to EC2
       uses: appleboy/ssh-action@v1.0.0
@@ -46,13 +48,17 @@ jobs:
           docker rm register-service || true
           docker stop login-root || true
           docker rm login-root || true
+          docker stop password || true
+          docker rm password || true
 
           # D
           docker pull kamartinez/login-service
           docker pull kamartinez/register-service
           docker pull kamartinez/login-root
+          docker pull kamartinez/password
 
           # Eje
           docker run -d --name login-service -p 8001:8001 --restart unless-stopped kamartinez/login-service
           docker run -d --name register-service -p 8002:8002 --restart unless-stopped kamartinez/register-service
           docker run -d --name login-root -p 8003:8003 --restart unless-stopped kamartinez/login-root
+          docker run -d --name password -p 8003:8003 --restart unless-stopped kamartinez/password
