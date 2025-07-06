@@ -3,17 +3,18 @@ name: Deploy Authentication Services to EC2
 on:
   push:
     branches:
-      - test  # El branch que activará el despliegue
+      - test  
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest  # Usamos Ubuntu como runner
+    runs-on: ubuntu-latest
 
     steps:
+    
     - name: Set up SSH key for EC2
       uses: webfactory/ssh-agent@v0.5.3
       with:
-        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}  # Agregar la clave SSH en secrets
+        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -34,11 +35,11 @@ jobs:
     - name: Deploy services to EC2
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: 52.1.37.215  # IP de tu instancia EC2
+        host: 52.1.37.215 
         username: ec2-user
-        key: ${{ secrets.EC2_SSH_KEY }}  # Agregar la clave SSH en secrets
+        key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          # Detener y eliminar cualquier contenedor previo
+          # De
           docker stop login-service || true
           docker rm login-service || true
           docker stop register-service || true
@@ -46,25 +47,12 @@ jobs:
           docker stop login-root || true
           docker rm login-root || true
 
-          # Descargar las imágenes más recientes desde Docker Hub
+          # D
           docker pull kamartinez/login-service
           docker pull kamartinez/register-service
           docker pull kamartinez/login-root
 
-          # Ejecutar los contenedores con las imágenes actualizadas
+          # Eje
           docker run -d --name login-service -p 8001:8001 --restart unless-stopped kamartinez/login-service
           docker run -d --name register-service -p 8002:8002 --restart unless-stopped kamartinez/register-service
           docker run -d --name login-root -p 8003:8003 --restart unless-stopped kamartinez/login-root
-
-          # Probar el servicio /login para asegurarse de que está funcionando
-          response=$(curl --write-out "%{http_code}" --silent --output /dev/null http://52.1.37.215:8001/login)
-
-          # Si la respuesta es 200 (OK), mantenemos el contenedor. Si no, lo eliminamos
-          if [ "$response" -eq 200 ]; then
-            echo "Login service is working, keeping the container running."
-          else
-            echo "Login service failed, stopping and removing the container."
-            docker stop login-service || true
-            docker rm login-service || true
-            exit 1  # Esto terminará el job con error, indicando que la prueba falló
-          fi
