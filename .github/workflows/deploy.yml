@@ -13,7 +13,7 @@ jobs:
     - name: Set up SSH key for EC2
       uses: webfactory/ssh-agent@v0.5.3
       with:
-        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}  # Asegúrate de agregar la clave SSH en secrets
+        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}  # Agregar la clave SSH en secrets
 
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -36,8 +36,8 @@ jobs:
         # Esperar que los contenedores estén disponibles
         sleep 10
 
-        # Realizar pruebas de salud (Health Check)
-        curl --fail http://localhost:8001/healthcheck || exit 1
+        # Realizar pruebas de salud (Health Check) usando la IP pública de EC2
+        curl --fail http://52.1.37.215:8001/healthcheck || exit 1  # Reemplaza con la IP pública de tu EC2
 
         # Realizar pruebas con pytest
         pytest
@@ -54,7 +54,7 @@ jobs:
       with:
         host: 52.1.37.215  # IP de tu instancia EC2
         username: ec2-user
-        key: ${{ secrets.EC2_SSH_KEY }}  # Agrega la clave SSH en secrets
+        key: ${{ secrets.EC2_SSH_KEY }}  # Agregar la clave SSH en secrets
         script: |
           # Detener y eliminar servicios previos
           docker stop login-service || true
