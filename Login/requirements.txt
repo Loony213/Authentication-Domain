@@ -3,3 +3,6 @@ pyodbc
 flask-cors
 python-dotenv
 PyJWT
+pytest
+requests
+flask-testing
