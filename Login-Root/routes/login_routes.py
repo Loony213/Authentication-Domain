@@ -3,6 +3,6 @@ from controllers.login_controller import login_user
 
 login_bp = Blueprint('login_bp', __name__)
 
-@login_bp.route('/login', methods=['POST'])
+@login_bp.route('/loginroot', methods=['POST'])
 def login():
     return login_user()
