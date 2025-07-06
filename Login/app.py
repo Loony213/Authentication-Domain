@@ -5,11 +5,6 @@ from routes.login_routes import login_bp
 app = Flask(__name__)
 CORS(app)
 
-# Ruta Health Check
-@app.route('/healthcheck', methods=['GET'])
-def healthcheck():
-    return jsonify({"status": "healthy"}), 200
-
 # Registrar Blueprint de login
 app.register_blueprint(login_bp)
 
