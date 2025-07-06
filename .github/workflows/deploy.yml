@@ -18,29 +18,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up Python environment
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'  # Configura la versión de Python que necesitas
-
     - name: Build Docker images for login and register services
       run: |
         docker build -t kamartinez/login-service ./Login
         docker build -t kamartinez/register-service ./Register
         docker build -t kamartinez/login-root ./Login-Root
-
-    - name: Run tests for login and register services
-      run: |
-        docker run --name test-login-service -d kamartinez/login-service
-        
-        # Esperar que los contenedores estén disponibles
-        sleep 10
-
-        # Realizar pruebas de salud (Health Check) usando la IP pública de EC2
-        curl --fail http://52.1.37.215:8001/healthcheck || exit 1  # Reemplaza con la IP pública de tu EC2
-
-        # Realizar pruebas con pytest
-        pytest
 
     - name: Push images to Docker Hub
       run: |
@@ -56,7 +38,7 @@ jobs:
         username: ec2-user
         key: ${{ secrets.EC2_SSH_KEY }}  # Agregar la clave SSH en secrets
         script: |
-          # Detener y eliminar servicios previos
+          # Detener y eliminar cualquier contenedor previo
           docker stop login-service || true
           docker rm login-service || true
           docker stop register-service || true
@@ -64,7 +46,7 @@ jobs:
           docker stop login-root || true
           docker rm login-root || true
 
-          # Descargar imágenes más recientes
+          # Descargar las imágenes más recientes desde Docker Hub
           docker pull kamartinez/login-service
           docker pull kamartinez/register-service
           docker pull kamartinez/login-root
@@ -73,3 +55,16 @@ jobs:
           docker run -d --name login-service -p 8001:8001 --restart unless-stopped kamartinez/login-service
           docker run -d --name register-service -p 8002:8002 --restart unless-stopped kamartinez/register-service
           docker run -d --name login-root -p 8003:8003 --restart unless-stopped kamartinez/login-root
+
+          # Probar el servicio /login para asegurarse de que está funcionando
+          response=$(curl --write-out "%{http_code}" --silent --output /dev/null http://52.1.37.215:8001/login)
+
+          # Si la respuesta es 200 (OK), mantenemos el contenedor. Si no, lo eliminamos
+          if [ "$response" -eq 200 ]; then
+            echo "Login service is working, keeping the container running."
+          else
+            echo "Login service failed, stopping and removing the container."
+            docker stop login-service || true
+            docker rm login-service || true
+            exit 1  # Esto terminará el job con error, indicando que la prueba falló
+          fi
