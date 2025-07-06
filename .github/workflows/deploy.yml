@@ -23,11 +23,6 @@ jobs:
       with:
         python-version: '3.x'  # Configura la versión de Python que necesitas
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
     - name: Build Docker images for login and register services
       run: |
         docker build -t kamartinez/login-service ./Login
